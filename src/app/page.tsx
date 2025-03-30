@@ -1,29 +1,11 @@
 // app/page.tsx 完整实现
 'use client'
 import { useEffect, useState } from 'react'
-
-// 完善数据类型定义
-interface RobotEvent {
-  robot_id: number
-  robot_name: string
-  timestamp: string
-  message: string
-}
-
-interface ParsedMessage {
-  location?: string
-  error?: string
-  [key: string]: unknown
-}
-
-interface RobotStatus {
-  RobotName: string
-  Timestamp: string
-  speed?: string
-  position?: string
-  battery?: string
-  water_tank?: string
-}
+import ConnectionStatus from '@/app/ui/home/connection-status'
+import WarningItem from '@/app/ui/home/warning-items'
+import StatusCard from '@/app/ui/home/status-card'
+import { RobotEvent, RobotStatus } from '@/app/types'
+import styles from '@/app/ui/home.module.css'
 
 export default function Home() {
   const [currentTime, setCurrentTime] = useState('')
@@ -46,9 +28,12 @@ export default function Home() {
 
     const handleInitialData = (initData: {
       events: RobotEvent[]
-      status: { robot_id: number; data: never; robot_name: string; timestamp: string }[]
+      status: Record<number, { data: never; robot_name: string; timestamp: string }>
     }) => {
-      if (!initData) return
+      if (!initData || !initData.events || !initData.status) {
+        console.warn('初始化数据为空或格式不正确:', initData)
+        return
+      }
       // 处理事件数据
       const latestEvents = initData.events
         .slice(-10)
@@ -57,8 +42,10 @@ export default function Home() {
 
       // 处理状态数据
       const newStatusMap = new Map<number, RobotStatus>()
-      initData.status.forEach(status => {
-        newStatusMap.set(status.robot_id, {
+      Object.entries(initData.status).forEach(([robotId, status]) => {
+        const robotIdNum = parseInt(robotId, 10)
+        newStatusMap.set(robotIdNum, {
+          robot_id: robotIdNum,
           ...(typeof status.data === 'object' && status.data !== null ? status.data : {}),
           RobotName: status.robot_name,
           Timestamp: status.timestamp
@@ -85,6 +72,7 @@ export default function Home() {
         const existing = newMap.get(status.robot_id) || {}
         newMap.set(status.robot_id, {
           ...existing,
+          robot_id: status.robot_id,
           ...(typeof status.data === 'object' && status.data !== null ? status.data : {}),
           RobotName: status.robot_name,
           Timestamp: status.timestamp
@@ -149,91 +137,26 @@ export default function Home() {
       ${String(date.getSeconds()).padStart(2, '0')}`.replace(/\n/g, ' ')
   }
 
-  // 解析事件消息
-  const parseEventMessage = (message: string): ParsedMessage => {
-    try {
-      return JSON.parse(message)
-    } catch {
-      return { error: '原始消息' }
-    }
-  }
-
-  // 状态卡片组件
-  const StatusCard = ({ robotId, status }: { robotId: number; status: RobotStatus }) => (
-    <div className="statusCard">
-      <div className="statusHeader">
-        <h3>{status.RobotName} (ID: {robotId})</h3>
-        <span className="timestamp">
-          最后更新：{new Date(status.Timestamp).toLocaleString()}
-        </span>
-      </div>
-      <div className="statusBody">
-        {status.speed && (
-          <div className="statusItem">
-            <label>速度：</label>
-            <span className="value">{status.speed}m/s</span>
-          </div>
-        )}
-        {status.position && (
-          <div className="statusItem">
-            <label>位置：</label>
-            <span className="value">{status.position}</span>
-          </div>
-        )}
-        {status.battery && (
-          <div className="statusItem">
-            <label>电量：</label>
-            <span className="value">{status.battery}%</span>
-          </div>
-        )}
-        {status.water_tank && (
-          <div className="statusItem">
-            <label>水箱量：</label>
-            <span className="value">{status.water_tank}%</span>
-          </div>
-        )}
-      </div>
-    </div>
-  )
-
   return (
-    <div className="container">
-      <header className="header">
-        <div className="timeDisplay">{currentTime}</div>
-        <div className={`connectStatus ${connectionStatus === '已连接' ? 'connected' : 'disconnected'}`}>
-          {connectionStatus}
-        </div>
+    <div className={styles.container}>
+      <header className={styles.header}>
+        <div className={styles.timeDisplay}>{currentTime}</div>
+        <ConnectionStatus status={connectionStatus} />
       </header>
 
-      <main className="content">
-        <section className="alerts">
-          <h2 className="sectionTitle">📢 紧急事件</h2>
-          <div className="warningList">
-            {events.map((event, index) => {
-              const parsed = parseEventMessage(event.message)
-              return (
-                <div key={`${event.robot_id}-${event.timestamp}-${index}`} className="warningItem">
-                  <span className="warningIcon">⚠️</span>
-                  <div className="warningInfo">
-                    <h3>{parsed.location || '未知位置'}</h3>
-                    <p>{parsed.error || (typeof parsed.message === 'string' ? parsed.message : '未知错误')}</p>
-                    <div className="robotInfo">
-                      <span>ID: {event.robot_id}</span>
-                      <span>名称: {event.robot_name}</span>
-                    </div>
-                  </div>
-                  <span className="timestamp">
-                    {new Date(event.timestamp).toLocaleString()}
-                  </span>
-                </div>
-              )
-            })}
+      <main className={styles.content}>
+        <section className={styles.alerts}>
+          <h2 className={styles.sectionTitle}>📢 紧急事件</h2>
+          <div className={styles.warningList}>
+            {events.map((event, index) => (
+              <WarningItem key={`${event.robot_id}-${event.timestamp}-${index}`} event={event} />
+            ))}
           </div>
         </section>
 
-        <section className="status">
-          <h2 className="sectionTitle">实时状态</h2>
-          <div className="statusList">
+        <section className={styles.status}>
+          <h2 className={styles.sectionTitle}>实时状态</h2>
+          <div className={styles.statusList}>
             {Array.from(statusData.entries()).map(([robotId, status]) => (
               <StatusCard key={robotId} robotId={robotId} status={status} />
             ))}

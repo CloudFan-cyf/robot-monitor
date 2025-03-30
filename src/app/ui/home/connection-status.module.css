@@ -1,0 +1,18 @@
+.connectStatus {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    padding: 8px 30px;
+    border-radius: 20px;
+    font-size: 0.9em;
+}
+
+.connected {
+    background: #2ecc71;
+    color: white;
+}
+
+.disconnected {
+    background: #e74c3c;
+    color: white;
+}

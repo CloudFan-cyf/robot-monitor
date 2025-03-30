@@ -1,0 +1,56 @@
+.statusCard {
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 15px;
+}
+
+.statusHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.statusHeader h3 {
+    margin: 0;
+    font-size: 1.1em;
+    color: #2c3e50;
+}
+
+.timestamp {
+    font-size: 0.85em;
+    color: #999;
+}
+
+.statusBody {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 10px;
+}
+
+.statusItem {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 12px;
+    background: #f8f9fa;
+    border-radius: 4px;
+}
+
+.statusItem label {
+    color: #7f8c8d;
+}
+
+.statusItem .value {
+    font-weight: 600;
+    color: #3498db;
+}
+
+@media (max-width: 480px) {
+    .statusHeader {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+}

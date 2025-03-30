@@ -1,0 +1,60 @@
+.container {
+    min-height: 100vh;
+}
+
+.header {
+    background: #2c3e50;
+    color: white;
+    padding: 1rem;
+    margin-bottom: 20px;
+    border-radius: 4px;
+    position: relative;
+}
+
+.timeDisplay {
+    font-family: 'Roboto Mono', monospace;
+    font-size: 1.2rem;
+    white-space: pre;
+    text-align: center;
+}
+
+.content {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 20px;
+}
+
+.alerts,
+.status {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.sectionTitle {
+    color: #e74c3c;
+    margin: 0 0 1rem 0;
+}
+
+.warningList {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.statusList {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+@media (max-width: 768px) {
+    .content {
+        grid-template-columns: 1fr;
+    }
+
+    .timeDisplay {
+        font-size: 1rem;
+    }
+}
