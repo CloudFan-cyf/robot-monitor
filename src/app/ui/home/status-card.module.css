@@ -47,6 +47,27 @@
     color: #3498db;
 }
 
+.severity {
+    padding: 2px 5px;
+    border-radius: 3px;
+    margin-right: 5px;
+}
+
+.severity.warning {
+    background: #f1c40f;
+    color: white;
+}
+
+.severity.error {
+    background: #e74c3c;
+    color: white;
+}
+
+.severity.critical {
+    background: #c0392b;
+    color: white;
+}
+
 @media (max-width: 480px) {
     .statusHeader {
         flex-direction: column;

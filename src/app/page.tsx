@@ -82,7 +82,7 @@ export default function Home() {
     }
 
     const connect = () => {
-      ws = new WebSocket('ws://localhost:8081/ws')
+      ws = new WebSocket('ws://localhost:80/ws')
 
       ws.onopen = () => {
         setConnectionStatus('已连接')
